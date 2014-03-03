@@ -50,6 +50,7 @@ class BingQuery(QueryMixin):
         params.update({
             'Query':    self.query.decode('utf-8').encode('utf-8'),
             'Sources':  self.SOURCE_TYPE,
+            '$format' :  'json'
         })
         return params
 
@@ -78,6 +79,7 @@ class BingQuery(QueryMixin):
         request.add_header('Authorization', auth)
         request.add_header('User-Agent', user_agent)
         request_opener = urllib2.build_opener()
+        print url
         return request_opener.open(request)
 
     def _clone(self):

@@ -21,6 +21,7 @@ class FileTypeQuery(WebQuery):
         self.filetype = filetype
         super(FileTypeQuery, self).__init__(app_id, query, version, *args, **kwargs)
 
+'''
     def get_request_parameters(self):
         params = super(FileTypeQuery, self).get_request_parameters()
         params.update({
@@ -28,3 +29,4 @@ class FileTypeQuery(WebQuery):
             'Web.Options' : "DisableHostCollapsing"
         })
         return params
+'''

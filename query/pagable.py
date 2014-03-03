@@ -43,10 +43,10 @@ class Pagable(QueryMixin):
         params = super(Pagable, self).get_request_parameters()
 
         if self.count:
-            params['%s.Count' % self.SOURCE_TYPE] = self.count
+            params['$top'] = self.count # % self.SOURCE_TYPE]
 
         if self.offset:
-            params['%s.Offset' % self.SOURCE_TYPE] = self.offset
+            params['$skip'] = self.offset
 
         return params
 
