@@ -49,15 +49,14 @@ class BingQuery(QueryMixin):
         params = super(BingQuery, self).get_request_parameters()
         params.update({
             'Query':    self.query.decode('utf-8').encode('utf-8'),
-            'Sources':  self.SOURCE_TYPE,
-            '$format' :  'json'
+            'Sources':  self.SOURCE_TYPE
         })
         return params
 
     def get_request_url(self):
         params = self.get_request_parameters()
         query_string = urllib.urlencode(params)
-        url = constants.JSON_ENDPOINT + '?' + query_string
+        url = constants.JSON_ENDPOINT + '?' + query_string + '&$format=json'
         return url.encode('utf-8')
 
     def get_search_response(self):
