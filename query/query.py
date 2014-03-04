@@ -18,7 +18,9 @@ class BingQuery(QueryMixin):
     def __init__(self, app_id, query=None, version=None, *args, **kwargs):
         self.app_id = app_id
         #self.version = version or constants.API_VERSION
-        self._query = query
+        self._query = "\'"+query+"\'"
+        
+        self.DEBUG = True
         
         # Needed for mixin's __init__'s to be called.
         super(BingQuery, self).__init__(*args, **kwargs)
@@ -49,7 +51,7 @@ class BingQuery(QueryMixin):
         params = super(BingQuery, self).get_request_parameters()
         params.update({
             'Query':    self.query.decode('utf-8').encode('utf-8'),
-            'Sources':  self.SOURCE_TYPE
+            'Sources':  "\'"+ self.SOURCE_TYPE + "\'"
         })
         return params
 
@@ -61,16 +63,15 @@ class BingQuery(QueryMixin):
 
     def get_search_response(self):
         data = self._get_url_contents(self.get_request_url())
-        return json.loads(data)['SearchResponse'][self.SOURCE_TYPE]
+        json_result = json.loads(data)
+        return json_result['d']
 
     def get_search_results(self):
         from pybing.result import BingResult
         response = self.get_search_response()
-        return [BingResult(result) for result in response['Results']]
+        return [BingResult(result) for result in response['results']]
 
     def _get_url_contents(self, url):
-        #return urllib2.urlopen(url).read()
-        
         user_agent = constants.USER_AGENT
         credentials = (':%s' % self.app_id).encode('base64')[:-1]
         auth = 'Basic %s' % credentials
@@ -78,8 +79,10 @@ class BingQuery(QueryMixin):
         request.add_header('Authorization', auth)
         request.add_header('User-Agent', user_agent)
         request_opener = urllib2.build_opener()
-        print url
-        return request_opener.open(request)
+        if self.DEBUG:
+            print "API endpoint url: %s" % url
+        response = request_opener.open(request)
+        return response.read()
 
     def _clone(self):
         """
