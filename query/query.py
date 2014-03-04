@@ -19,8 +19,7 @@ class BingQuery(QueryMixin):
         self.app_id = app_id
         #self.version = version or constants.API_VERSION
         self._query = "\'"+query+"\'"
-        
-        self.DEBUG = True
+        self.DEBUG = constants.DEBUG
         
         # Needed for mixin's __init__'s to be called.
         super(BingQuery, self).__init__(*args, **kwargs)
@@ -69,7 +68,7 @@ class BingQuery(QueryMixin):
     def get_search_results(self):
         from pybing.result import BingResult
         response = self.get_search_response()
-        return [BingResult(result) for result in response['results']]
+        return [BingResult(result) for result in response['results'][0][self.SOURCE_TYPE] ]
 
     def _get_url_contents(self, url):
         user_agent = constants.USER_AGENT
