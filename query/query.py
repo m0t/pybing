@@ -40,8 +40,8 @@ class BingQuery(QueryMixin):
         if not self.query:
             raise ValueError, 'Query cannot be empty or None'
 
-        elif not self.SOURCE_TYPE:
-            raise ValueError, 'Source Type cannot be empty or None'
+        #elif not self.SOURCE_TYPE:
+        #    raise ValueError, 'Source Type cannot be empty or None'
 
         from pybing.resultset import BingResultSet
         return BingResultSet(self)
@@ -49,33 +49,38 @@ class BingQuery(QueryMixin):
     def get_request_parameters(self):
         params = super(BingQuery, self).get_request_parameters()
         params.update({
-            'Query':    self.query.decode('utf-8').encode('utf-8'),
-            'Sources':  "\'"+ self.SOURCE_TYPE + "\'"
+            'q':    self.query.decode('utf-8').encode('utf-8'),
+            #'Sources':  source_type or constants.DEFAULT_SOURCE_TYPE,
+            'mkt':  "en-us",
+            'safesearch':   "Off"
         })
         return params
 
     def get_request_url(self):
         params = self.get_request_parameters()
         query_string = urllib.urlencode(params)
-        url = constants.JSON_ENDPOINT + '?' + query_string + '&$format=json'
+        url = constants.JSON_ENDPOINT + '?' + query_string
         return url.encode('utf-8')
 
     def get_search_response(self):
         data = self._get_url_contents(self.get_request_url())
         json_result = json.loads(data)
-        return json_result['d']
+        open("test.json", 'w+').write((json.dumps(json_result, indent=4)))
+        return json_result['webPages']
 
     def get_search_results(self):
         from pybing.result import BingResult
         response = self.get_search_response()
-        return [BingResult(result) for result in response['results'][0][self.SOURCE_TYPE] ]
+        return [BingResult(result) for result in response['value'] ]
 
     def _get_url_contents(self, url):
         user_agent = constants.USER_AGENT
-        credentials = (':%s' % self.app_id).encode('base64')[:-1]
-        auth = 'Basic %s' % credentials
+        #credentials = (':%s' % self.app_id).encode('base64')[:-1]
+        #auth = 'Basic %s' % credentials
+        
         request = urllib2.Request(url)
-        request.add_header('Authorization', auth)
+        #print(url)
+        request.add_header('Ocp-Apim-Subscription-Key', self.app_id)
         request.add_header('User-Agent', user_agent)
         request_opener = urllib2.build_opener()
         if self.DEBUG:

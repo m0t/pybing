@@ -14,18 +14,21 @@ class Bing(object):
         kwargs.update({
             #'AppId':    self.app_id,
             #'Version':  api_version or constants.API_VERSION,
-            'Query':    query,
-            'Sources':  source_type or constants.DEFAULT_SOURCE_TYPE,
+            'q':    query,
+            #'Sources':  source_type or constants.DEFAULT_SOURCE_TYPE,
+            'mkt':  "en-us",
+            'safesearch':   "Off"
         })
 
         query_string = urllib.urlencode(kwargs)
         url = "%s?%s" % (constants.JSON_ENDPOINT, query_string)
         
         user_agent = 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; FDM; .NET CLR 2.0.50727; InfoPath.2; .NET CLR 1.1.4322)'
-        credentials = (':%s' % self.app_id).encode('base64')[:-1]
-        auth = 'Basic %s' % credentials
+        #credentials = (':%s' % self.app_id).encode('base64')[:-1]
+        #auth = 'Basic %s' % credentials
         request = urllib2.Request(url)
-        request.add_header('Authorization', auth)
+        print(url)
+        request.add_header('Ocp-Apim-Subscription-Key', self.app_id)
         request.add_header('User-Agent', user_agent)
         request_opener = urllib2.build_opener()
         response = request_opener.open(request)
